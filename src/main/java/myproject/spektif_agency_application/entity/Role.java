@@ -1,5 +1,5 @@
 package myproject.spektif_agency_application.entity;
 
-public enum UserRole {
+public enum Role {
     ADMIN, EMPLOYEE, CLIENT
 }
