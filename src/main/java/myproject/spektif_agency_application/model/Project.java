@@ -30,6 +30,10 @@ public class Project {
     private User assignedTo;
 
     @ManyToOne
+    @JoinColumn(name = "client_id")
+    private User client;
+
+    @ManyToOne
     @JoinColumn(name = "deadline_id")
     private Deadline deadline;
 }

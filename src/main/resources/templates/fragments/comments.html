@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="commentBox(projectId)">
+<div>
+    <h4>Comments</h4>
+    <form th:action="@{/comments/add}" method="post">
+        <input type="hidden" name="projectId" th:value="${projectId}" />
+        <textarea name="content" placeholder="Leave a comment"></textarea>
+        <button type="submit">Post</button>
+    </form>
+
+    <ul th:each="comment : ${comments}">
+        <li>
+            <span th:text="${comment.content}"></span> —
+            <small th:text="${comment.createdAt}"></small>
+        </li>
+    </ul>
+</div>

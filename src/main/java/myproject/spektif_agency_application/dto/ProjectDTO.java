@@ -16,5 +16,6 @@ public class ProjectDTO {
     private String status;
     private String deliverablePath;
     private Long assignedToUserId;
+    private Long clientId;
     private Long deadlineId;
 }

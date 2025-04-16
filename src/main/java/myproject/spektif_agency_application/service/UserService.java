@@ -1,5 +1,6 @@
 package myproject.spektif_agency_application.service;
 
+import myproject.spektif_agency_application.dto.ProjectDTO;
 import myproject.spektif_agency_application.dto.UserDTO;
 
 import java.util.List;
@@ -10,4 +11,7 @@ public interface UserService {
     Optional<UserDTO> findByUsername(String username);
     List<UserDTO> getAllUsers();
     UserDTO saveUser(UserDTO userDTO);
+    UserDTO updateUser(UserDTO userDTO);
+    void deleteUser(Long id);
+    List<ProjectDTO> getAllProjectHistory();
 }

@@ -16,11 +16,12 @@ public class ProjectMapper {
                 .status(project.getStatus().name())
                 .deliverablePath(project.getDeliverablePath())
                 .assignedToUserId(project.getAssignedTo() != null ? project.getAssignedTo().getId() : null)
+                .clientId(project.getClient() != null ? project.getClient().getId() : null)
                 .deadlineId(project.getDeadline() != null ? project.getDeadline().getId() : null)
                 .build();
     }
 
-    public static Project toEntity(ProjectDTO dto, User assignedUser, Deadline deadline) {
+    public static Project toEntity(ProjectDTO dto, User assignedUser, User client, Deadline deadline) {
         return Project.builder()
                 .id(dto.getId())
                 .title(dto.getTitle())
@@ -28,6 +29,7 @@ public class ProjectMapper {
                 .deliverablePath(dto.getDeliverablePath())
                 .status(ProjectStatus.valueOf(dto.getStatus()))
                 .assignedTo(assignedUser)
+                .client(client)
                 .deadline(deadline)
                 .build();
     }

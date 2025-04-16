@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: spektif_agency_application
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+  datasource:
+    url: jdbc:h2:file:./data/agency_db
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+  security:
+    user:
+      name: admin
+      password: admin123
+      roles: ADMIN
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+    include-exception: false
+
+file:
+  upload-dir: ./uploads 

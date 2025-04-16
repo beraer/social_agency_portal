@@ -8,22 +8,22 @@ import myproject.spektif_agency_application.model.User;
 public class CommentMapper {
 
     public static CommentDTO toDTO(Comment comment) {
-        return CommentDTO.builder()
-                .id(comment.getId())
-                .content(comment.getContent())
-                .createdAt(comment.getCreatedAt())
-                .authorId(comment.getAuthor() != null ? comment.getAuthor().getId() : null)
-                .projectId(comment.getProject() != null ? comment.getProject().getId() : null)
-                .build();
+        return new CommentDTO(
+            comment.getId(),
+            comment.getContent(),
+            comment.getProject().getId(),
+            comment.getUser().getId(),
+            comment.getUser().getUsername(),
+            comment.getCreatedAt()
+        );
     }
 
     public static Comment toEntity(CommentDTO dto, User author, Project project) {
-        return Comment.builder()
-                .id(dto.getId())
-                .content(dto.getContent())
-                .createdAt(dto.getCreatedAt())
-                .author(author)
-                .project(project)
-                .build();
+        Comment comment = new Comment();
+        comment.setContent(dto.getContent());
+        comment.setProject(project);
+        comment.setUser(author);
+        comment.setCreatedAt(dto.getCreatedAt() != null ? dto.getCreatedAt() : java.time.LocalDateTime.now());
+        return comment;
     }
 }

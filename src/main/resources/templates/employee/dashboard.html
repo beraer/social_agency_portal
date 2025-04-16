@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employee Dashboard - Spektif Agency</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/employee/dashboard">Spektif Agency</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/employee/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/employee/projects">My Projects</a>
+                    </li>
+                </ul>
+                <form th:action="@{/logout}" method="post" class="d-flex">
+                    <button class="btn btn-outline-light" type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">My Projects</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Client</th>
+                                        <th>Deadline</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="project : ${projects}">
+                                        <td th:text="${project.title}"></td>
+                                        <td th:text="${project.client.username}"></td>
+                                        <td th:text="${#temporals.format(project.deadline, 'dd/MM/yyyy')}"></td>
+                                        <td>
+                                            <select class="form-select form-select-sm" th:data-id="${project.id}" onchange="updateStatus(this)">
+                                                <option th:value="ON_PROGRESS" th:selected="${project.status == 'ON_PROGRESS'}">On Progress</option>
+                                                <option th:value="COMPLETED" th:selected="${project.status == 'COMPLETED'}">Completed</option>
+                                                <option th:value="BLOCKED" th:selected="${project.status == 'BLOCKED'}">Blocked</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary" th:data-id="${project.id}" onclick="uploadFile(this)">
+                                                <i class="bi bi-upload"></i> Upload
+                                            </button>
+                                            <button class="btn btn-sm btn-info" th:data-id="${project.id}" onclick="viewFiles(this)">
+                                                <i class="bi bi-folder"></i> Files
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="uploadForm" th:action="@{/employee/upload}" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Select File</label>
+                            <div class="file-upload">
+                                <input type="file" id="fileInput" name="file" accept="image/png,video/mp4,video/quicktime" required>
+                                <p>Drag and drop files here or click to browse</p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">File Type</label>
+                            <select class="form-select" name="fileType" required>
+                                <option value="IMAGE">Image</option>
+                                <option value="VIDEO">Video</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/employee.js"></script>
+</body>
+</html>
