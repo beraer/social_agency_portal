@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
+@Table(name = "users")
 @Entity
 public class User {
     @Id
@@ -11,8 +12,16 @@ public class User {
     private Long id;
     private String username;
     private String password;
-    private String email;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    public User(String username, String password, UserRole role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
+    public User() {
+    }
 }
