@@ -1,8 +1,8 @@
 package myproject.spektif_agency_application.mapper;
 
 import myproject.spektif_agency_application.dto.DeadlineDTO;
-import myproject.spektif_agency_application.entity.Deadline;
-import myproject.spektif_agency_application.entity.User;
+import myproject.spektif_agency_application.model.Deadline;
+import myproject.spektif_agency_application.model.User;
 
 public class DeadlineMapper {
 

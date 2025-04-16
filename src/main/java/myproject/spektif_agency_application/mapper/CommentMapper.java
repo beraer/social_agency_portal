@@ -1,7 +1,9 @@
 package myproject.spektif_agency_application.mapper;
 
 import myproject.spektif_agency_application.dto.CommentDTO;
-import myproject.spektif_agency_application.entity.*;
+import myproject.spektif_agency_application.model.Comment;
+import myproject.spektif_agency_application.model.Project;
+import myproject.spektif_agency_application.model.User;
 
 public class CommentMapper {
 

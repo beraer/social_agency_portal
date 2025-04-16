@@ -1,4 +1,4 @@
-package myproject.spektif_agency_application.entity;
+package myproject.spektif_agency_application.model;
 
 
 import jakarta.persistence.*;

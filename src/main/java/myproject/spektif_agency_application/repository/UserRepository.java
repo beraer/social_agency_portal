@@ -1,6 +1,6 @@
 package myproject.spektif_agency_application.repository;
 
-import myproject.spektif_agency_application.entity.User;
+import myproject.spektif_agency_application.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

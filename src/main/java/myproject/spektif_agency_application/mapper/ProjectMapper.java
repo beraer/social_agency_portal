@@ -1,7 +1,10 @@
 package myproject.spektif_agency_application.mapper;
 
 import myproject.spektif_agency_application.dto.ProjectDTO;
-import myproject.spektif_agency_application.entity.*;
+import myproject.spektif_agency_application.model.Deadline;
+import myproject.spektif_agency_application.model.Project;
+import myproject.spektif_agency_application.model.ProjectStatus;
+import myproject.spektif_agency_application.model.User;
 
 public class ProjectMapper {
 

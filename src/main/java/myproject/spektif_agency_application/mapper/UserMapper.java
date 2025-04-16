@@ -1,8 +1,8 @@
 package myproject.spektif_agency_application.mapper;
 
 import myproject.spektif_agency_application.dto.UserDTO;
-import myproject.spektif_agency_application.entity.Role;
-import myproject.spektif_agency_application.entity.User;
+import myproject.spektif_agency_application.model.Role;
+import myproject.spektif_agency_application.model.User;
 
 public class UserMapper {
 
