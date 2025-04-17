@@ -42,14 +42,4 @@ public class ClientController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
-
-
-    @GetMapping("/projects/{id}/files")
-    public ResponseEntity<?> getProjectFiles(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(projectService.getProjectFiles(id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
 }

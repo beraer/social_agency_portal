@@ -73,13 +73,14 @@ public class UserServiceImpl implements UserService {
         return projectRepository.findAll().stream()
                 .map(project -> ProjectDTO.builder()
                         .id(project.getId())
-                        .title(project.getTitle())
-                        .description(project.getDescription())
+                        .name(project.getName())
+                        .startDate(project.getStartDate())
+                        .endDate(project.getEndDate())
                         .status(project.getStatus().name())
-                        .assignedToUserId(project.getAssignedTo().getId())
-                        .clientId(project.getClient().getId())
-                        .deadlineId(project.getDeadline().getId())
+                        .clientId(project.getClient() != null ? project.getClient().getId() : null)
+                        .cardId(project.getCard() != null ? project.getCard().getId() : null)
                         .build())
                 .collect(Collectors.toList());
     }
+
 }

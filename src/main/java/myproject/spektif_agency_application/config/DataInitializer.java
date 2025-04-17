@@ -23,15 +23,15 @@ public class DataInitializer {
     CommandLineRunner initUsers(UserRepository userRepository, PasswordEncoder encoder) {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()) {
-                userRepository.save(new User(null, "admin", encoder.encode("admin123"), Role.ADMIN, null));
+                userRepository.save(new User(null, "admin", encoder.encode("admin123"), Role.ADMIN));
             }
 
             if (userRepository.findByUsername("employee").isEmpty()) {
-                userRepository.save(new User(null, "employee", encoder.encode("emp123"), Role.EMPLOYEE, null));
+                userRepository.save(new User(null, "employee", encoder.encode("emp123"), Role.EMPLOYEE));
             }
 
             if (userRepository.findByUsername("client").isEmpty()) {
-                userRepository.save(new User(null, "client", encoder.encode("cli123"), Role.CLIENT, null));
+                userRepository.save(new User(null, "client", encoder.encode("cli123"), Role.CLIENT));
             }
         };
     }

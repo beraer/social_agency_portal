@@ -24,16 +24,13 @@ public class BoardListMapper {
                 .build();
     }
 
-    public static BoardList toEntity(BoardListDTO dto, List<User> users) {
-        BoardList list = new BoardList();
-        list.setId(dto.getId());
-        list.setTitle(dto.getTitle());
-        list.setDescription(dto.getDescription());
-
-        if (dto.getMemberIds() != null) {
-            list.setMembers(users); // Caller must pass resolved User list
-        }
-
-        return list;
+    public static BoardList toEntity(BoardListDTO dto, User owner, List<User> members) {
+        return BoardList.builder()
+                .id(dto.getId())
+                .title(dto.getTitle())
+                .description(dto.getDescription())
+                .owner(owner)
+                .members(members)
+                .build();
     }
 }

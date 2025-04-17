@@ -28,7 +28,4 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "assignedTo", cascade = CascadeType.ALL)
-    @Builder.Default
-    private Set<Project> assignedProjects = new HashSet<>();
 }
