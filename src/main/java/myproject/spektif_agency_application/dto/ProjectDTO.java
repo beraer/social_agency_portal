@@ -1,21 +1,19 @@
 package myproject.spektif_agency_application.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ProjectDTO {
     private Long id;
-    private String title;
-    private String description;
+    private String name;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String status;
-    private String deliverablePath;
-    private Long assignedToUserId;
     private Long clientId;
-    private Long deadlineId;
+    private Long cardId;
 }

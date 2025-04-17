@@ -1,18 +1,16 @@
 package myproject.spektif_agency_application.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Project {
 
     @Id
@@ -31,6 +29,6 @@ public class Project {
     @ManyToOne
     private User client;
 
-    @OneToOne(mappedBy = "project")
+    @OneToOne(mappedBy = "projectDetails")
     private Card card;
 }

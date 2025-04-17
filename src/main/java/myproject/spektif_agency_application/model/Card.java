@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Card {
 
     @Id
@@ -33,7 +33,7 @@ public class Card {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id")
-    private Project project;
+    private Project projectDetails;
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardAttachment> attachments = new ArrayList<>();
