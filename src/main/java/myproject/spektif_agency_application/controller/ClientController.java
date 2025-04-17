@@ -1,9 +1,7 @@
 package myproject.spektif_agency_application.controller;
 
 import lombok.RequiredArgsConstructor;
-import myproject.spektif_agency_application.dto.CommentDTO;
 import myproject.spektif_agency_application.dto.ProjectDTO;
-import myproject.spektif_agency_application.service.CommentService;
 import myproject.spektif_agency_application.service.ProjectService;
 import myproject.spektif_agency_application.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +21,6 @@ public class ClientController {
 
     private final ProjectService projectService;
     private final UserService userService;
-    private final CommentService commentService;
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal UserDetails userDetails, Model model) {
@@ -46,21 +43,6 @@ public class ClientController {
         }
     }
 
-    @PostMapping("/projects/{id}/comments")
-    public ResponseEntity<?> addComment(@PathVariable Long id, @RequestBody CommentDTO commentDTO,
-                                      @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            Long userId = userService.findByUsername(userDetails.getUsername())
-                    .orElseThrow()
-                    .getId();
-            commentDTO.setProjectId(id);
-            commentDTO.setAuthorId(userId);
-            CommentDTO saved = commentService.addComment(commentDTO);
-            return ResponseEntity.ok(saved);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
 
     @GetMapping("/projects/{id}/files")
     public ResponseEntity<?> getProjectFiles(@PathVariable Long id) {

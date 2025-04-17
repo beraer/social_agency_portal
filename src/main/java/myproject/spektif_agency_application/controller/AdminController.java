@@ -25,14 +25,27 @@ public class AdminController {
     public String adminDashboard(Model model) {
         List<DeadlineDTO> deadlines = deadlineService.getAllDeadlines();
         List<ProjectDTO> completedProjects = projectService.getProjectsByStatus("COMPLETED");
-        List<UserDTO> employees = userService.getAllUsers();
+
+        List<UserDTO> allUsers = userService.getAllUsers();
+
+        List<UserDTO> employees = allUsers.stream()
+                .filter(u -> u.getRole().equals("EMPLOYEE"))
+                .toList();
+
+        List<UserDTO> clients = allUsers.stream()
+                .filter(u -> u.getRole().equals("CLIENT"))
+                .toList();
 
         model.addAttribute("deadlines", deadlines);
         model.addAttribute("completedProjects", completedProjects);
         model.addAttribute("employees", employees);
+        model.addAttribute("clients", clients);
+        model.addAttribute("user", new UserDTO());
 
         return "admin/dashboard";
     }
+
+
 
     @GetMapping("/deadlines/create")
     public String createDeadlineForm(Model model) {
@@ -57,25 +70,16 @@ public class AdminController {
         }
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        try {
-            userDTO.setId(id);
-            UserDTO updatedUser = userService.updateUser(userDTO);
-            return ResponseEntity.ok(updatedUser);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    @GetMapping("/users/create")
+    public String showCreateUserForm(Model model) {
+        model.addAttribute("user", new UserDTO());
+        return "admin/create-user";
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    @PostMapping("/users/create")
+    public String createUserFormSubmit(@ModelAttribute("user") UserDTO userDTO) {
+        userService.saveUser(userDTO);
+        return "redirect:/admin/dashboard";
     }
 
     @PostMapping("/users/{id}/promote")
@@ -92,8 +96,41 @@ public class AdminController {
 
     @GetMapping("/history")
     public String viewHistory(Model model) {
-        // Add project history and user activity
         model.addAttribute("projects", userService.getAllProjectHistory());
         return "admin/history";
     }
+
+
+    // GET - return user info for edit modal
+    @GetMapping("/users/{id}")
+    @ResponseBody
+    public UserDTO getUserById(@PathVariable Long id) {
+        return userService.findById(id).orElseThrow();
+    }
+
+    // PUT - update user
+    @PutMapping("/users/{id}")
+    @ResponseBody
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+        try {
+            userDTO.setId(id);
+            UserDTO updated = userService.updateUser(userDTO);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // DELETE - delete user
+    @DeleteMapping("/users/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }

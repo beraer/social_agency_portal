@@ -1,84 +1,78 @@
-function editUser(button) {
-    const userId = button.getAttribute('data-id');
-    // Implement edit functionality
-    console.log('Edit user:', userId);
-}
+document.addEventListener('DOMContentLoaded', function () {
+    showSection('projectSection');
+    initializeTooltips();
+});
 
-function deleteUser(button) {
-    const userId = button.getAttribute('data-id');
-    if (confirm('Are you sure you want to delete this user?')) {
-        fetch(`/admin/users/${userId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                button.closest('tr').remove();
-                showAlert('User deleted successfully', 'success');
-            } else {
-                showAlert('Error deleting user', 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlert('Error deleting user', 'danger');
-        });
-    }
-}
-
-function promoteToAdmin(button) {
-    const userId = button.getAttribute('data-id');
-    if (confirm('Are you sure you want to promote this user to admin?')) {
-        fetch(`/admin/users/${userId}/promote`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                location.reload();
-                showAlert('User promoted to admin successfully', 'success');
-            } else {
-                showAlert('Error promoting user', 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlert('Error promoting user', 'danger');
-        });
-    }
-}
-
-function showAlert(message, type) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-    alertDiv.role = 'alert';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    const container = document.querySelector('.container');
-    container.insertBefore(alertDiv, container.firstChild);
-    
-    setTimeout(() => {
-        alertDiv.remove();
-    }, 5000);
-}
-
-// Handle form submissions
-document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            if (!form.checkValidity()) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            form.classList.add('was-validated');
-        });
+function showSection(id) {
+    ['projectSection', 'employeeSection', 'clientSection'].forEach(sec => {
+        document.getElementById(sec).style.display = (sec === id) ? 'block' : 'none';
     });
-}); 
+}
+
+function deleteUser(userId) {
+    if (!confirm('Are you sure you want to delete this user?')) return;
+
+    fetch(`/admin/users/${userId}`, {
+        method: 'DELETE'
+    }).then(response => {
+        if (!response.ok) throw new Error('Failed to delete user');
+        location.reload();
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function promoteToAdmin(userId) {
+    if (!confirm('Promote to admin?')) return;
+
+    fetch(`/admin/users/${userId}/promote`, {
+        method: 'POST'
+    }).then(response => {
+        if (!response.ok) throw new Error('Failed to promote user');
+        location.reload();
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function initializeTooltips() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+}
+
+
+function editUser(userId) {
+    fetch(`/admin/users/${userId}`)
+        .then(res => res.json())
+        .then(user => {
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUsername').value = user.username;
+            document.getElementById('editRole').value = user.role;
+
+            new bootstrap.Modal(document.getElementById('editUserModal')).show();
+        });
+}
+
+document.getElementById('editUserForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const userId = document.getElementById('editUserId').value;
+    const payload = {
+        username: document.getElementById('editUsername').value,
+        role: document.getElementById('editRole').value
+    };
+
+    fetch(`/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("Update failed");
+            return res.json();
+        })
+        .then(() => location.reload())
+        .catch(err => console.error(err));
+});

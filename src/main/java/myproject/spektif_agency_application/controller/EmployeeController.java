@@ -1,7 +1,6 @@
 package myproject.spektif_agency_application.controller;
 
 import lombok.RequiredArgsConstructor;
-import myproject.spektif_agency_application.dto.CommentDTO;
 import myproject.spektif_agency_application.dto.ProjectDTO;
 import myproject.spektif_agency_application.service.CommentService;
 import myproject.spektif_agency_application.service.ProjectService;
@@ -41,22 +40,6 @@ public class EmployeeController {
         try {
             ProjectDTO updated = projectService.updateProjectStatus(id, status.get("status"));
             return ResponseEntity.ok(updated);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    @PostMapping("/projects/{id}/comments")
-    public ResponseEntity<?> addComment(@PathVariable Long id, @RequestBody CommentDTO commentDTO,
-                                      @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            Long userId = userService.findByUsername(userDetails.getUsername())
-                    .orElseThrow()
-                    .getId();
-            commentDTO.setProjectId(id);
-            commentDTO.setAuthorId(userId);
-            CommentDTO saved = commentService.addComment(commentDTO);
-            return ResponseEntity.ok(saved);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
