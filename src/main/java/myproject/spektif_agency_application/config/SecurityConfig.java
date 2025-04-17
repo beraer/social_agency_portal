@@ -20,30 +20,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/h2-console/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/employee/**").hasRole("EMPLOYEE")
-                .requestMatchers("/client/**").hasRole("CLIENT")
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/")
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-            )
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**")
-            )
-            .headers(headers -> headers
-                .frameOptions(frame -> frame
-                    .sameOrigin()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/dashboard", "/employee/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .anyRequest().authenticated()
                 )
-            );
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/employee/dashboard", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout.permitAll());
 
         return http.build();
     }

@@ -2,6 +2,7 @@ package myproject.spektif_agency_application.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import myproject.spektif_agency_application.dto.BoardListDTO;
+import myproject.spektif_agency_application.dto.CardDTO;
 import myproject.spektif_agency_application.mapper.BoardListMapper;
 import myproject.spektif_agency_application.model.BoardList;
 import myproject.spektif_agency_application.model.User;
@@ -70,4 +71,5 @@ public class BoardListServiceImpl implements BoardListService {
     public void deleteBoardList(Long id) {
         boardListRepository.deleteById(id);
     }
+
 }

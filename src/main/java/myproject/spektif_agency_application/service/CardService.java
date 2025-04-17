@@ -16,4 +16,6 @@ public interface CardService {
     CardDTO updateCard(Long id, CardDTO cardDTO);
 
     void deleteCard(Long id);
+
+
 }

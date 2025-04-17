@@ -1,118 +1,696 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Dashboard - Spektif Agency</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a2e15;
+            --card-bg: #2a2a2a;
+            --header-bg: #222;
+            --text-color: #fff;
+            --secondary-text: #aaa;
+            --accent-color: #1a73e8;
+            --border-color: #444;
+            --list-header-bg: #333;
+            --hover-bg: #3a3a3a;
+            --add-list-bg: rgba(255, 255, 255, 0.1);
+            --add-list-hover: rgba(255, 255, 255, 0.2);
+            --button-bg: #0079bf;
+            --button-hover: #026aa7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%230a2e15"/><circle cx="10" cy="10" r="1" fill="%23ffffff10"/><circle cx="30" cy="40" r="1" fill="%23ffffff10"/><circle cx="70" cy="20" r="1" fill="%23ffffff10"/><circle cx="90" cy="60" r="1" fill="%23ffffff10"/><circle cx="50" cy="80" r="1" fill="%23ffffff10"/></svg>');
+        }
+
+        header {
+            background-color: var(--header-bg);
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-left img {
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar {
+            margin-right: 20px;
+            position: relative;
+        }
+
+        .search-bar input {
+            background-color: #444;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            padding: 6px 10px 6px 30px;
+            outline: none;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #e74c3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .board-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .board-title {
+            display: flex;
+            align-items: center;
+        }
+
+        .board-title h1 {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .star-icon {
+            color: goldenrod;
+            cursor: pointer;
+        }
+
+        .private-label {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 3px;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+
+        .board-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .board-actions button {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 3px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .board-actions button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .board-actions button i {
+            margin-right: 5px;
+        }
+
+        .board-content {
+            display: flex;
+            padding: 0 10px;
+            overflow-x: auto;
+            height: calc(100vh - 120px);
+        }
+
+        .list {
+            background-color: var(--card-bg);
+            border-radius: 5px;
+            width: 280px;
+            margin-right: 10px;
+            flex-shrink: 0;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-header {
+            padding: 10px;
+            font-weight: bold;
+            background-color: var(--list-header-bg);
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-title {
+            display: flex;
+            align-items: center;
+        }
+
+        .list-icon {
+            margin-right: 5px;
+        }
+
+        .list-menu {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .list-menu:hover {
+            opacity: 1;
+        }
+
+        .cards-container {
+            padding: 5px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .card {
+            background-color: #333;
+            border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .card:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .card-labels {
+            display: flex;
+            margin-bottom: 5px;
+        }
+
+        .card-label {
+            height: 8px;
+            width: 40px;
+            border-radius: 4px;
+            margin-right: 4px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--secondary-text);
+            margin-top: 5px;
+        }
+
+        .card-due {
+            display: flex;
+            align-items: center;
+            padding: 2px 4px;
+            border-radius: 3px;
+            background-color: rgba(255, 204, 0, 0.2);
+            color: #ffcc00;
+            font-size: 11px;
+        }
+
+        .card-due i {
+            margin-right: 4px;
+            font-size: 10px;
+        }
+
+        .card-members {
+            display: flex;
+        }
+
+        .card-member {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #9c27b0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 10px;
+            margin-left: -4px;
+            border: 1px solid var(--card-bg);
+        }
+
+        .add-card {
+            padding: 10px;
+            color: var(--secondary-text);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .add-card:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-color);
+        }
+
+        .add-card i {
+            margin-right: 5px;
+        }
+
+        .add-list-button {
+            background-color: var(--add-list-bg);
+            border-radius: 5px;
+            width: 280px;
+            height: fit-content;
+            flex-shrink: 0;
+            padding: 10px;
+            cursor: pointer;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+
+        .add-list-button:hover {
+            background-color: var(--add-list-hover);
+        }
+
+        .add-list-button i {
+            margin-right: 5px;
+        }
+
+        .add-list-form {
+            background-color: var(--card-bg);
+            border-radius: 5px;
+            width: 280px;
+            padding: 10px;
+            flex-shrink: 0;
+            display: none;
+            margin-right: 10px;
+        }
+
+        .add-list-form input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+            background-color: #444;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .add-list-form input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .form-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .add-button {
+            background-color: var(--button-bg);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .add-button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .cancel-button {
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .cancel-button:hover {
+            color: var(--text-color);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: var(--card-bg);
+            margin: 50px auto;
+            width: 700px;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--secondary-text);
+        }
+
+        .close-modal:hover {
+            color: var(--text-color);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .modal-title i {
+            margin-right: 10px;
+            color: var(--secondary-text);
+        }
+
+        .modal-title-input {
+            font-size: 18px;
+            font-weight: bold;
+            width: 90%;
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-color);
+            padding: 5px;
+        }
+
+        .modal-title-input:focus {
+            background-color: #444;
+            border: 1px solid var(--border-color);
+            outline: none;
+        }
+
+        .modal-subtitle {
+            color: var(--secondary-text);
+            font-size: 14px;
+            margin-left: 30px;
+        }
+
+        .modal-body {
+            display: flex;
+            padding: 20px;
+        }
+
+        .modal-main {
+            flex: 3;
+            padding-right: 20px;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-section-title i {
+            margin-right: 10px;
+            color: var(--secondary-text);
+        }
+
+        .modal-section-content {
+            margin-left: 30px;
+        }
+
+        .modal-sidebar {
+            flex: 1;
+        }
+
+        .sidebar-section {
+            margin-bottom: 15px;
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--secondary-text);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-button {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: none;
+            padding: 8px;
+            border-radius: 3px;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .sidebar-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-button i {
+            margin-right: 8px;
+            color: var(--secondary-text);
+        }
+
+        .comment-box {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #e74c3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .comment-input {
+            flex-grow: 1;
+            background-color: #444;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            color: white;
+            resize: vertical;
+            min-height: 40px;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .activity-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .activity-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #3498db;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex-grow: 1;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .activity-name {
+            font-weight: bold;
+        }
+
+        .activity-time {
+            color: var(--secondary-text);
+            font-size: 12px;
+        }
+
+        .activity-text {
+            margin-bottom: 5px;
+        }
+
+        .due-date-label {
+            background-color: #ffcc0030;
+            color: #ffcc00;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .attachment-card {
+            background-color: #444;
+            border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .attachment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .attachment-thumbnail {
+            width: 100%;
+            height: 150px;
+            background-color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .attachment-thumbnail img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .attachment-actions {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .attachment-action {
+            color: var(--secondary-text);
+            cursor: pointer;
+        }
+
+        .attachment-action:hover {
+            color: var(--text-color);
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/employee/dashboard">Spektif Agency</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/employee/dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/employee/projects">My Projects</a>
-                    </li>
-                </ul>
-                <form th:action="@{/logout}" method="post" class="d-flex">
-                    <button class="btn btn-outline-light" type="submit">Logout</button>
-                </form>
+<header>
+    <div class="header-left">
+        <div style="width:30px; height:30px; background:#0a2e15; display:flex; justify-content:center; align-items:center; border-radius:3px; margin-right: 10px;">S</div>
+        <span>Spektif Agency</span>
+    </div>
+    <div class="header-right">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search">
+        </div>
+        <div class="profile-icon" th:text="${username.substring(0,1).toUpperCase()}">U</div>
+        <form th:action="@{/logout}" method="post" style="margin-left: 10px;">
+            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+        </form>
+    </div>
+</header>
+
+<div class="board-header">
+    <div class="board-title">
+        <h1>My Tasks</h1>
+    </div>
+</div>
+
+<div class="board-content">
+    <div class="list" th:each="list : ${boardLists}">
+        <div class="list-header">
+            <div class="list-title">
+                <span class="list-icon">📋</span>
+                <span th:text="${list.title}">List Title</span>
             </div>
         </div>
-    </nav>
-
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">My Projects</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Client</th>
-                                        <th>Deadline</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="project : ${projects}">
-                                        <td th:text="${project.title}"></td>
-                                        <td th:text="${project.client.username}"></td>
-                                        <td th:text="${#temporals.format(project.deadline, 'dd/MM/yyyy')}"></td>
-                                        <td>
-                                            <select class="form-select form-select-sm" th:data-id="${project.id}" onchange="updateStatus(this)">
-                                                <option th:value="ON_PROGRESS" th:selected="${project.status == 'ON_PROGRESS'}">On Progress</option>
-                                                <option th:value="COMPLETED" th:selected="${project.status == 'COMPLETED'}">Completed</option>
-                                                <option th:value="BLOCKED" th:selected="${project.status == 'BLOCKED'}">Blocked</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-primary" th:data-id="${project.id}" onclick="uploadFile(this)">
-                                                <i class="bi bi-upload"></i> Upload
-                                            </button>
-                                            <button class="btn btn-sm btn-info" th:data-id="${project.id}" onclick="viewFiles(this)">
-                                                <i class="bi bi-folder"></i> Files
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+        <div class="cards-container">
+            <div class="card" th:each="card : ${list.cards}">
+                <div class="card-title" th:text="${card.title}">Card Title</div>
+                <div class="card-meta">
+                    <div class="card-members">
+                        <div class="card-member" th:each="memberId : ${card.assignedMemberIds}" th:text="${memberId}">M</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- File Upload Modal -->
-    <div class="modal fade" id="uploadModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Upload File</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="uploadForm" th:action="@{/employee/upload}" method="post" enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Select File</label>
-                            <div class="file-upload">
-                                <input type="file" id="fileInput" name="file" accept="image/png,video/mp4,video/quicktime" required>
-                                <p>Drag and drop files here or click to browse</p>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">File Type</label>
-                            <select class="form-select" name="fileType" required>
-                                <option value="IMAGE">Image</option>
-                                <option value="VIDEO">Video</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Upload</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/employee.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

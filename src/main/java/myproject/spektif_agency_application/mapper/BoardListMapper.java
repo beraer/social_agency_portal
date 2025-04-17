@@ -4,6 +4,7 @@ import myproject.spektif_agency_application.dto.BoardListDTO;
 import myproject.spektif_agency_application.model.BoardList;
 import myproject.spektif_agency_application.model.User;
 
+
 import java.util.List;
 import java.util.stream.Collectors;
 

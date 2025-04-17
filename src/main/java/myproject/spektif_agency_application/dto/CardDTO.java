@@ -18,4 +18,6 @@ public class CardDTO {
     private Long boardListId;
     private ProjectDTO projectDetails;
     private List<CardAttachmentDTO> attachments;
+    private List<Long> assignedMemberIds;
+
 }

@@ -2,7 +2,6 @@ package myproject.spektif_agency_application.controller;
 
 import lombok.RequiredArgsConstructor;
 import myproject.spektif_agency_application.dto.BoardListDTO;
-import myproject.spektif_agency_application.dto.UserDTO;
 import myproject.spektif_agency_application.service.BoardListService;
 import myproject.spektif_agency_application.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

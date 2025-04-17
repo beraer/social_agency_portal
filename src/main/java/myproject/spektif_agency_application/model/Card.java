@@ -37,4 +37,12 @@ public class Card {
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardAttachment> attachments = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "card_assigned_members",
+            joinColumns = @JoinColumn(name = "card_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> assignedMembers = new ArrayList<>();
 }
