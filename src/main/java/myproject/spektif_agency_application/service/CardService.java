@@ -9,13 +9,16 @@ public interface CardService {
 
     CardDTO createCard(CardDTO cardDTO);
 
-    Optional<CardDTO> getCardById(Long id);
-
-    List<CardDTO> getCardsByBoardListId(Long boardListId);
-
-    CardDTO updateCard(Long id, CardDTO cardDTO);
+    List<CardDTO> getAllCards();
 
     void deleteCard(Long id);
 
+    Optional<CardDTO> getCardById(Long id);
+
+    Optional<CardDTO> updateCard(CardDTO cardDTO);
+
+    Optional<CardDTO> addMemberToCard(Long cardId, Long memberId);
+
+    Optional<CardDTO> removeMemberFromCard(Long cardId, Long memberId);
 
 }

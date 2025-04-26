@@ -1,23 +1,26 @@
 package myproject.spektif_agency_application.dto;
 
-import lombok.*;
-import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CardDTO {
     private Long id;
     private String title;
     private String description;
-    private LocalDate dueDate;
-    private boolean isProject;
-    private Long boardListId;
-    private ProjectDTO projectDetails;
-    private List<CardAttachmentDTO> attachments;
+    private LocalDateTime deadline;
+    private Long listId;
     private List<Long> assignedMemberIds;
-
+    private List<AttachmentDTO> attachments;
+    private List<CommentDTO> comments;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

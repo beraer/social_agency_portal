@@ -3,694 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Employee Dashboard - Spektif Agency</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0a2e15;
-            --card-bg: #2a2a2a;
-            --header-bg: #222;
-            --text-color: #fff;
-            --secondary-text: #aaa;
-            --accent-color: #1a73e8;
-            --border-color: #444;
-            --list-header-bg: #333;
-            --hover-bg: #3a3a3a;
+            --primary-bg: #2c3e50;
+            --secondary-bg: #34495e;
+            --card-bg: #ecf0f1;
+            --text-color: #2c3e50;
+            --secondary-text: #7f8c8d;
+            --accent-color: #3498db;
+            --border-color: #bdc3c7;
+            --hover-bg: rgba(0, 0, 0, 0.1);
+            --list-header-bg: #f8f9fa;
             --add-list-bg: rgba(255, 255, 255, 0.1);
             --add-list-hover: rgba(255, 255, 255, 0.2);
-            --button-bg: #0079bf;
-            --button-hover: #026aa7;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--primary-bg);
             color: var(--text-color);
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%230a2e15"/><circle cx="10" cy="10" r="1" fill="%23ffffff10"/><circle cx="30" cy="40" r="1" fill="%23ffffff10"/><circle cx="70" cy="20" r="1" fill="%23ffffff10"/><circle cx="90" cy="60" r="1" fill="%23ffffff10"/><circle cx="50" cy="80" r="1" fill="%23ffffff10"/></svg>');
-        }
-
-        header {
-            background-color: var(--header-bg);
-            padding: 10px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-left img {
-            height: 24px;
-            margin-right: 10px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-        }
-
-        .search-bar {
-            margin-right: 20px;
-            position: relative;
-        }
-
-        .search-bar input {
-            background-color: #444;
-            border: none;
-            border-radius: 3px;
-            color: white;
-            padding: 6px 10px 6px 30px;
-            outline: none;
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-        }
-
-        .profile-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #e74c3c;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .board-header {
-            padding: 20px;
+            padding: 15px;
+            background-color: var(--secondary-bg);
+            color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .board-title {
+        .user-info {
             display: flex;
             align-items: center;
+            gap: 10px;
         }
 
-        .board-title h1 {
-            margin-right: 10px;
-            font-size: 18px;
-        }
-
-        .star-icon {
-            color: goldenrod;
-            cursor: pointer;
-        }
-
-        .private-label {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 4px 8px;
-            border-radius: 3px;
-            margin-left: 10px;
-            font-size: 12px;
-        }
-
-        .board-actions {
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
             display: flex;
             align-items: center;
-        }
-
-        .board-actions button {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: none;
+            justify-content: center;
             color: white;
-            padding: 6px 12px;
-            border-radius: 3px;
-            margin-left: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-
-        .board-actions button:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .board-actions button i {
-            margin-right: 5px;
+            font-weight: bold;
         }
 
         .board-content {
             display: flex;
-            padding: 0 10px;
+            padding: 20px;
+            gap: 20px;
             overflow-x: auto;
-            height: calc(100vh - 120px);
+            min-height: calc(100vh - 70px);
         }
 
         .list {
             background-color: var(--card-bg);
-            border-radius: 5px;
-            width: 280px;
-            margin-right: 10px;
-            flex-shrink: 0;
-            max-height: 100%;
+            border-radius: 8px;
+            width: 300px;
+            min-width: 300px;
+            max-height: calc(100vh - 90px);
             display: flex;
             flex-direction: column;
         }
 
         .list-header {
-            padding: 10px;
-            font-weight: bold;
+            padding: 15px;
             background-color: var(--list-header-bg);
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .list-title {
-            display: flex;
-            align-items: center;
-        }
-
-        .list-icon {
-            margin-right: 5px;
-        }
-
-        .list-menu {
-            cursor: pointer;
-            opacity: 0.7;
-        }
-
-        .list-menu:hover {
-            opacity: 1;
+            font-weight: 600;
+            font-size: 1.1rem;
         }
 
         .cards-container {
-            padding: 5px;
-            overflow-y: auto;
+            padding: 10px;
             flex-grow: 1;
+            overflow-y: auto;
         }
 
         .card {
-            background-color: #333;
-            border-radius: 3px;
-            padding: 10px;
-            margin-bottom: 8px;
+            background-color: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             cursor: pointer;
-            border-left: 3px solid transparent;
+            transition: transform 0.2s;
         }
 
         .card:hover {
-            background-color: var(--hover-bg);
-        }
-
-        .card-labels {
-            display: flex;
-            margin-bottom: 5px;
-        }
-
-        .card-label {
-            height: 8px;
-            width: 40px;
-            border-radius: 4px;
-            margin-right: 4px;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .card-title {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .card-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: var(--secondary-text);
-            margin-top: 5px;
-        }
-
-        .card-due {
-            display: flex;
-            align-items: center;
-            padding: 2px 4px;
-            border-radius: 3px;
-            background-color: rgba(255, 204, 0, 0.2);
-            color: #ffcc00;
-            font-size: 11px;
-        }
-
-        .card-due i {
-            margin-right: 4px;
-            font-size: 10px;
+            font-weight: 500;
+            margin-bottom: 8px;
         }
 
         .card-members {
             display: flex;
+            gap: 5px;
         }
 
         .card-member {
             width: 24px;
             height: 24px;
+            background-color: var(--accent-color);
             border-radius: 50%;
-            background-color: #9c27b0;
             display: flex;
+            align-items: center;
             justify-content: center;
-            align-items: center;
             color: white;
-            font-size: 10px;
-            margin-left: -4px;
-            border: 1px solid var(--card-bg);
-        }
-
-        .add-card {
-            padding: 10px;
-            color: var(--secondary-text);
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-
-        .add-card:hover {
-            background-color: var(--hover-bg);
-            color: var(--text-color);
-        }
-
-        .add-card i {
-            margin-right: 5px;
-        }
-
-        .add-list-button {
-            background-color: var(--add-list-bg);
-            border-radius: 5px;
-            width: 280px;
-            height: fit-content;
-            flex-shrink: 0;
-            padding: 10px;
-            cursor: pointer;
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            margin-right: 10px;
-        }
-
-        .add-list-button:hover {
-            background-color: var(--add-list-hover);
-        }
-
-        .add-list-button i {
-            margin-right: 5px;
+            font-size: 0.8rem;
         }
 
         .add-list-form {
             background-color: var(--card-bg);
-            border-radius: 5px;
-            width: 280px;
-            padding: 10px;
-            flex-shrink: 0;
-            display: none;
-            margin-right: 10px;
+            border-radius: 8px;
+            padding: 15px;
+            width: 300px;
+            min-width: 300px;
         }
 
         .add-list-form input {
             width: 100%;
             padding: 8px;
-            border-radius: 3px;
             border: 1px solid var(--border-color);
-            background-color: #444;
-            color: white;
+            border-radius: 4px;
             margin-bottom: 10px;
         }
 
-        .add-list-form input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        .form-buttons {
-            display: flex;
-            align-items: center;
-        }
-
-        .add-button {
-            background-color: var(--button-bg);
-            border: none;
+        .add-list-form button {
+            background-color: var(--accent-color);
             color: white;
-            padding: 6px 12px;
-            border-radius: 3px;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
         }
 
-        .add-button:hover {
-            background-color: var(--button-hover);
+        .add-list-form button:hover {
+            background-color: #2980b9;
         }
 
-        .cancel-button {
-            background: none;
-            border: none;
+        .add-card-button {
+            width: 100%;
+            padding: 8px;
+            background-color: transparent;
+            border: 2px dashed var(--border-color);
+            border-radius: 4px;
             color: var(--secondary-text);
             cursor: pointer;
-            margin-left: 10px;
+            transition: all 0.2s;
         }
 
-        .cancel-button:hover {
+        .add-card-button:hover {
+            background-color: var(--hover-bg);
             color: var(--text-color);
-        }
-
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
         }
 
         .modal-content {
-            position: relative;
             background-color: var(--card-bg);
-            margin: 50px auto;
-            width: 700px;
-            border-radius: 6px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--secondary-text);
-        }
-
-        .close-modal:hover {
-            color: var(--text-color);
         }
 
         .modal-header {
-            padding: 20px;
+            background-color: var(--list-header-bg);
             border-bottom: 1px solid var(--border-color);
         }
 
-        .modal-title {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
         }
 
-        .modal-title i {
-            margin-right: 10px;
-            color: var(--secondary-text);
-        }
-
-        .modal-title-input {
-            font-size: 18px;
-            font-weight: bold;
-            width: 90%;
-            background: none;
-            border: 1px solid transparent;
+        .deadline-input {
             color: var(--text-color);
-            padding: 5px;
-        }
-
-        .modal-title-input:focus {
-            background-color: #444;
-            border: 1px solid var(--border-color);
-            outline: none;
-        }
-
-        .modal-subtitle {
-            color: var(--secondary-text);
-            font-size: 14px;
-            margin-left: 30px;
-        }
-
-        .modal-body {
-            display: flex;
-            padding: 20px;
-        }
-
-        .modal-main {
-            flex: 3;
-            padding-right: 20px;
-        }
-
-        .modal-section {
-            margin-bottom: 20px;
-        }
-
-        .modal-section-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        .modal-section-title i {
-            margin-right: 10px;
-            color: var(--secondary-text);
-        }
-
-        .modal-section-content {
-            margin-left: 30px;
-        }
-
-        .modal-sidebar {
-            flex: 1;
-        }
-
-        .sidebar-section {
-            margin-bottom: 15px;
-        }
-
-        .sidebar-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: var(--secondary-text);
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-button {
-            display: flex;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
-            border: none;
-            padding: 8px;
-            border-radius: 3px;
-            width: 100%;
-            text-align: left;
-            margin-bottom: 5px;
-            cursor: pointer;
-        }
-
-        .sidebar-button:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .sidebar-button i {
-            margin-right: 8px;
-            color: var(--secondary-text);
-        }
-
-        .comment-box {
-            display: flex;
-            margin-top: 10px;
-        }
-
-        .comment-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #e74c3c;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-        .comment-input {
-            flex-grow: 1;
-            background-color: #444;
-            border-radius: 3px;
-            border: 1px solid var(--border-color);
-            padding: 8px;
-            color: white;
-            resize: vertical;
-            min-height: 40px;
-        }
-
-        .comment-input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        .activity-item {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-        .activity-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #3498db;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-        .activity-content {
-            flex-grow: 1;
-        }
-
-        .activity-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-
-        .activity-name {
-            font-weight: bold;
-        }
-
-        .activity-time {
-            color: var(--secondary-text);
-            font-size: 12px;
-        }
-
-        .activity-text {
-            margin-bottom: 5px;
-        }
-
-        .due-date-label {
-            background-color: #ffcc0030;
-            color: #ffcc00;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 12px;
-            display: inline-block;
-        }
-
-        .attachment-card {
-            background-color: #444;
-            border-radius: 3px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .attachment-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .attachment-thumbnail {
-            width: 100%;
-            height: 150px;
-            background-color: #555;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 3px;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-
-        .attachment-thumbnail img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        .attachment-actions {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-        }
-
-        .attachment-action {
-            color: var(--secondary-text);
-            cursor: pointer;
-        }
-
-        .attachment-action:hover {
-            color: var(--text-color);
-            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-<header>
-    <div class="header-left">
-        <div style="width:30px; height:30px; background:#0a2e15; display:flex; justify-content:center; align-items:center; border-radius:3px; margin-right: 10px;">S</div>
-        <span>Spektif Agency</span>
-    </div>
-    <div class="header-right">
-        <div class="search-bar">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Search">
+    <div class="board-header">
+        <h2>My Tasks</h2>
+        <div class="user-info">
+            <div class="user-avatar" th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">U</div>
+            <span th:text="${#authentication.name}">Username</span>
+            <button class="btn btn-light ms-3" data-bs-toggle="modal" data-bs-target="#createListModal">
+                <i class="fas fa-plus"></i> New List
+            </button>
         </div>
-        <div class="profile-icon" th:text="${username.substring(0,1).toUpperCase()}">U</div>
-        <form th:action="@{/logout}" method="post" style="margin-left: 10px;">
-            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
-        </form>
     </div>
-</header>
 
-<div class="board-header">
-    <div class="board-title">
-        <h1>My Tasks</h1>
-    </div>
-</div>
-
-<div class="board-content">
-    <div class="list" th:each="list : ${boardLists}">
-        <div class="list-header">
-            <div class="list-title">
-                <span class="list-icon">📋</span>
-                <span th:text="${list.title}">List Title</span>
+    <div class="board-content">
+        <!-- Board Lists -->
+        <div th:each="list : ${boardLists}" class="list">
+            <div class="list-header">
+                <span class="list-title" th:text="${list.title}">List Title</span>
+                <div class="dropdown">
+                    <button class="btn btn-link" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" th:href="@{/employee/boardlists/edit/{id}(id=${list.id})}">Edit</a></li>
+                        <li>
+                            <form th:action="@{/employee/boardlists/delete/{id}(id=${list.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item">Delete</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="cards-container">
+                <div th:each="card : ${list.cards}" class="card" 
+                     th:data-card-id="${card.id}"
+                     onclick="openCardDetail(this)">
+                    <h6 class="card-title" th:text="${card.title}">Card Title</h6>
+                    <p class="card-description" th:text="${card.description}">Description</p>
+                    <div class="card-members">
+                        <div th:each="memberId : ${card.assignedMemberIds}" class="card-member" 
+                             th:with="member=${members.?[id == __${memberId}__]?.get(0)}"
+                             th:if="${member != null}"
+                             th:text="${#strings.substring(member.username,0,1).toUpperCase()}"
+                             th:title="${member.username}">
+                        </div>
+                    </div>
+                    <div class="card-deadline" th:if="${card.deadline != null}">
+                        <small class="text-muted" th:text="${#temporals.format(card.deadline, 'dd/MM/yyyy HH:mm')}">Deadline</small>
+                    </div>
+                </div>
+                <button class="add-card-button" th:data-list-id="${list.id}" data-bs-toggle="modal" data-bs-target="#createCardModal">
+                    <i class="fas fa-plus"></i> Add Card
+                </button>
             </div>
         </div>
-        <div class="cards-container">
-            <div class="card" th:each="card : ${list.cards}">
-                <div class="card-title" th:text="${card.title}">Card Title</div>
-                <div class="card-meta">
-                    <div class="card-members">
-                        <div class="card-member" th:each="memberId : ${card.assignedMemberIds}" th:text="${memberId}">M</div>
+
+        <!-- Add List Button -->
+        <div class="add-list-form">
+            <button class="btn btn-light w-100" data-bs-toggle="modal" data-bs-target="#createListModal">
+                <i class="fas fa-plus"></i> Add List
+            </button>
+        </div>
+    </div>
+
+    <!-- Create List Modal -->
+    <div class="modal fade" id="createListModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New List</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/employee/boardlists/create}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="listTitle" class="form-label">List Title</label>
+                            <input type="text" class="form-control" id="listTitle" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="listDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="listDescription" name="description" rows="3"></textarea>
+                        </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create List</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Card Modal -->
+    <div class="modal fade" id="createCardModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Card</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="createCardForm" th:action="@{/employee/cards/create}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="modal-body">
+                        <input type="hidden" id="listId" name="listId">
+                        <div class="mb-3">
+                            <label for="cardTitle" class="form-label">Card Title</label>
+                            <input type="text" class="form-control" id="cardTitle" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cardDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="cardDescription" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cardDeadline" class="form-label">Deadline</label>
+                            <input type="datetime-local" class="form-control deadline-input" id="cardDeadline" name="deadline">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Card</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Member</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="memberSelect" class="form-label">Select Member</label>
+                        <select class="form-select" id="memberSelect">
+                            <option value="">Choose...</option>
+                            <option th:each="member : ${members}"
+                                    th:value="${member.id}"
+                                    th:text="${member.username}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addMemberToCard()">Add Member</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/employee-board.js"></script>
 </body>
 </html>

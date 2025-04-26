@@ -2,60 +2,73 @@ package myproject.spektif_agency_application.controller;
 
 import lombok.RequiredArgsConstructor;
 import myproject.spektif_agency_application.dto.CardDTO;
-import myproject.spektif_agency_application.service.BoardListService;
 import myproject.spektif_agency_application.service.CardService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Controller
-@RequestMapping("/employee/cards")
+@RestController
+@RequestMapping("/api/cards")
 @RequiredArgsConstructor
 public class CardController {
 
     private final CardService cardService;
-    private final BoardListService boardListService;
 
-    @GetMapping("/list/{boardListId}")
-    public String viewCards(@PathVariable Long boardListId, Model model) {
-        List<CardDTO> cards = cardService.getCardsByBoardListId(boardListId);
-        model.addAttribute("cards", cards);
-        model.addAttribute("boardListId", boardListId);
-        return "employee/card-list";
+    @GetMapping("/{id}")
+    public ResponseEntity<CardDTO> getCardDetails(@PathVariable Long id) {
+        try {
+            return cardService.getCardById(id)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @GetMapping("/create/{boardListId}")
-    public String showCreateCardForm(@PathVariable Long boardListId, Model model) {
-        CardDTO card = new CardDTO();
-        card.setBoardListId(boardListId);
-        model.addAttribute("card", card);
-        return "employee/card-form";
+    @GetMapping("/list/{listId}")
+    public ResponseEntity<List<CardDTO>> getCardsByList(@PathVariable Long listId) {
+        try {
+            List<CardDTO> cards = cardService.getAllCards().stream()
+                    .filter(card -> card.getListId() != null && card.getListId().equals(listId))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(cards);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @PostMapping("/create")
-    public String createCard(@ModelAttribute("card") CardDTO cardDTO) {
-        cardService.createCard(cardDTO);
-        return "redirect:/employee/cards/list/" + cardDTO.getBoardListId();
+    @PostMapping
+    public ResponseEntity<CardDTO> createCard(@RequestBody CardDTO cardDTO) {
+        try {
+            CardDTO createdCard = cardService.createCard(cardDTO);
+            return ResponseEntity.ok(createdCard);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
-        CardDTO card = cardService.getCardById(id).orElseThrow();
-        model.addAttribute("card", card);
-        return "employee/card-form";
+    @PutMapping("/{id}")
+    public ResponseEntity<CardDTO> updateCard(@PathVariable Long id, @RequestBody CardDTO cardDTO) {
+        try {
+            cardDTO.setId(id);
+            return cardService.updateCard(cardDTO)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @PostMapping("/edit/{id}")
-    public String updateCard(@PathVariable Long id, @ModelAttribute("card") CardDTO cardDTO) {
-        cardService.updateCard(id, cardDTO);
-        return "redirect:/employee/cards/list/" + cardDTO.getBoardListId();
-    }
-
-    @PostMapping("/delete/{id}")
-    public String deleteCard(@PathVariable Long id, @RequestParam Long boardListId) {
-        cardService.deleteCard(id);
-        return "redirect:/employee/cards/list/" + boardListId;
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCard(@PathVariable Long id) {
+        try {
+            cardService.deleteCard(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

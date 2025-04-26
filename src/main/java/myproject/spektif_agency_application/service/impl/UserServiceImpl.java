@@ -3,6 +3,7 @@ package myproject.spektif_agency_application.service.impl;
 import lombok.RequiredArgsConstructor;
 import myproject.spektif_agency_application.dto.ProjectDTO;
 import myproject.spektif_agency_application.dto.UserDTO;
+import myproject.spektif_agency_application.model.Role;
 import myproject.spektif_agency_application.model.User;
 import myproject.spektif_agency_application.mapper.UserMapper;
 import myproject.spektif_agency_application.repository.ProjectRepository;
@@ -83,4 +84,18 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<UserDTO> getAllEmployees() {
+        return userRepository.findByRole(Role.EMPLOYEE).stream()
+                .map(UserMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void promoteToAdmin(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setRole(Role.ADMIN);
+        userRepository.save(user);
+    }
 }

@@ -29,6 +29,6 @@ public class Project {
     @ManyToOne
     private User client;
 
-    @OneToOne(mappedBy = "projectDetails")
+    @OneToOne(mappedBy = "project")
     private Card card;
 }
