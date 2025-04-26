@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -69,6 +70,17 @@ public class CardController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/{cardId}/move")
+    public ResponseEntity<?> moveCard(@PathVariable Long cardId, @RequestBody Map<String, Long> payload) {
+        Long newListId = payload.get("listId");
+        try {
+            cardService.moveCardToList(cardId, newListId);
+            return ResponseEntity.ok().body(Map.of("message", "Card moved successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 }

@@ -122,4 +122,14 @@ public class CardServiceImpl implements CardService {
         card.getAssignedMembers().remove(member);
         return Optional.of(CardMapper.toDTO(cardRepository.save(card)));
     }
+
+    @Override
+    public void moveCardToList(Long cardId, Long newListId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new RuntimeException("Card not found"));
+        BoardList newList = boardListRepository.findById(newListId)
+                .orElseThrow(() -> new RuntimeException("List not found"));
+        card.setList(newList);
+        cardRepository.save(card);
+    }
 }

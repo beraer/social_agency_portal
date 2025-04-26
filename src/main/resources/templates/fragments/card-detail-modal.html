@@ -185,9 +185,16 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button class="add-button" onclick="showAddMemberModal()">
-                                        <i class="fas fa-plus"></i> Add member
-                                    </button>
+                                    <div class="mt-2">
+                                        <select class="form-select" id="memberSelect" onchange="addMemberToCard(this.value)">
+                                            <option value="">Add a member...</option>
+                                            <option th:each="member : ${members}"
+                                                    th:if="${!card.assignedMemberIds.contains(member.id)}"
+                                                    th:value="${member.id}"
+                                                    th:text="${member.username}">
+                                            </option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="sidebar-section">

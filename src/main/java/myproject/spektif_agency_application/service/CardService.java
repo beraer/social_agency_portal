@@ -21,4 +21,6 @@ public interface CardService {
 
     Optional<CardDTO> removeMemberFromCard(Long cardId, Long memberId);
 
+    void moveCardToList(Long cardId, Long newListId);
+
 }

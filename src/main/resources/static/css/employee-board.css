@@ -1,0 +1,174 @@
+:root {
+    --primary-bg: #00C853;
+    --secondary-bg: #111111;
+    --card-bg: #FFFFFF;
+    --text-color: #111111;
+    --secondary-text: #00C853;
+    --accent-color: #00C853;
+    --border-color: #E0E0E0;
+    --hover-bg: #E8F5E9;
+    --list-header-bg: #F5F5F5;
+    --add-list-bg: #F5F5F5;
+    --add-list-hover: #E8F5E9;
+}
+
+body {
+    background: var(--primary-bg);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.list {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    width: 300px;
+    min-width: 300px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.list-header {
+    padding: 15px;
+    background: rgba(255,255,255,0.25);
+    color: #111;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: 18px 18px 0 0;
+    box-shadow: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-cards {
+    padding: 10px;
+}
+
+.add-card-btn-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.add-card-button {
+    padding: 18px 0;
+    width: 90%;
+    font-size: 1.1rem;
+    border-radius: 16px;
+    margin: 0 auto;
+    display: block;
+}
+
+.add-list-form {
+    width: 300px;
+    min-width: 300px;
+    height: auto;
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    backdrop-filter: blur(6px);
+    border-radius: 18px;
+    border: 1px solid rgba(0,0,0,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.2s;
+    color: var(--text-color);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.card-ghost {
+    opacity: 0.5;
+    background: #c8ebfb;
+}
+
+.card-chosen {
+    background: #e3f2fd;
+    transform: scale(1.02);
+}
+
+.card-drag {
+    background: #e3f2fd;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.glassy-header {
+    background: rgba(17, 34, 17, 0.85);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    backdrop-filter: blur(8px);
+    border-radius: 0 0 24px 24px;
+    color: #fff;
+}
+
+.employee-badge {
+    background: rgba(0, 200, 83, 0.15);
+    color: #00C853;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.btn-glass {
+    background: rgba(255,255,255,0.15);
+    color: #00C853;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.btn-glass:hover, .btn-glass:focus {
+    background: rgba(0,200,83,0.15);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(0,200,83,0.12);
+}
+
+.board-content-horizontal {
+    background: var(--primary-bg);
+    min-height: 100vh;
+    overflow-x: auto;
+}
+
+.d-flex.flex-row.gap-4 {
+    flex-wrap: nowrap;
+}
+
+.glassy-list {
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    backdrop-filter: blur(6px);
+    border-radius: 18px;
+    border: 1px solid rgba(0,0,0,0.04);
+}
+
+.glassy-card {
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.04);
+    color: var(--text-color);
+}
+
+::-webkit-scrollbar {
+    height: 10px;
+    background: rgba(0,0,0,0.05);
+}
+::-webkit-scrollbar-thumb {
+    background: #00C853;
+    border-radius: 8px;
+} 

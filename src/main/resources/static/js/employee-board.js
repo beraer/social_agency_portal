@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ghostClass: 'card-ghost',
             chosenClass: 'card-chosen',
             dragClass: 'card-drag',
+            draggable: '.card', // Only .card elements are draggable
             onEnd: async function(evt) {
                 const cardId = evt.item.getAttribute('data-card-id');
                 const newListId = evt.to.closest('.list').getAttribute('data-list-id');
@@ -37,7 +38,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
 
                     if (!response.ok) {
-                        showAlert('Error moving card. Please try again.', 'danger');
+                        let errorMsg = 'Error moving card. Please try again.';
+                        try {
+                            const errorData = await response.json();
+                            if (errorData && errorData.message) errorMsg = errorData.message;
+                        } catch (e) {}
+                        showAlert(errorMsg, 'danger');
                         evt.from.appendChild(evt.item);
                     }
                 } catch (error) {
@@ -305,8 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, { once: true });
     };
 
-    window.addMemberToCard = async function() {
-        const memberId = document.getElementById('memberSelect').value;
+    window.addMemberToCard = async function(memberId) {
         if (!memberId) return;
         
         try {
@@ -321,10 +326,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!response.ok) throw new Error('Failed to add member');
             
-            addMemberModal.hide();
             const card = await response.json();
             await loadCardMembers(card.assignedMemberIds);
             showAlert('Member added successfully', 'success');
+            
+            // Reset the select
+            document.getElementById('memberSelect').value = '';
         } catch (error) {
             console.error('Error:', error);
             showAlert('Error adding member', 'danger');
