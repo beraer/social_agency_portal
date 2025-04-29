@@ -12,6 +12,7 @@ public class BoardListDTO {
     private Long id;
     private String title;
     private String description;
+    private Integer order;
     private Long ownerId;
     private List<Long> memberIds;
     private List<CardDTO> cards;

@@ -1,4 +1,4 @@
-package myproject.spektif_agency_application.controller;
+package myproject.spektif_agency_application.controller.api;
 
 import lombok.RequiredArgsConstructor;
 import myproject.spektif_agency_application.dto.CardDTO;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/cards")
 @RequiredArgsConstructor
-public class CardController {
+public class CardApiController {
 
     private final CardService cardService;
 
@@ -83,4 +83,4 @@ public class CardController {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
-}
+} 

@@ -9,7 +9,6 @@ public interface BoardListService {
 
     BoardListDTO createBoardList(BoardListDTO dto);
 
-
     Optional<BoardListDTO> getById(Long id);
 
     BoardListDTO updateBoardList(Long id, BoardListDTO dto);
@@ -17,4 +16,6 @@ public interface BoardListService {
     void deleteBoardList(Long id);
 
     List<BoardListDTO> getAllLists();
+
+    void reorderLists(List<Long> listIds);
 }

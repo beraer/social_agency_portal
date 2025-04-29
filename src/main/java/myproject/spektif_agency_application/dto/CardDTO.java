@@ -1,11 +1,11 @@
 package myproject.spektif_agency_application.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
-
+import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,9 +18,13 @@ public class CardDTO {
     private String description;
     private LocalDateTime deadline;
     private Long listId;
-    private List<Long> assignedMemberIds;
-    private List<AttachmentDTO> attachments;
-    private List<CommentDTO> comments;
+    private String listTitle;
+    @Builder.Default
+    private List<Long> assignedMemberIds = new ArrayList<>();
+    @Builder.Default
+    private List<AttachmentDTO> attachments = new ArrayList<>();
+    @Builder.Default
+    private List<ActivityDTO> activities = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

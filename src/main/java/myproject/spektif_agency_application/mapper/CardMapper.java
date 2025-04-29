@@ -17,18 +17,22 @@ public class CardMapper {
                 .description(card.getDescription())
                 .deadline(card.getDeadline())
                 .listId(card.getList() != null ? card.getList().getId() : null)
+                .listTitle(card.getList() != null ? card.getList().getTitle() : null)
                 .assignedMemberIds(card.getAssignedMembers() != null ? 
-                        card.getAssignedMembers().stream()
-                                .map(member -> member.getId())
-                                .collect(Collectors.toList()) : null)
+                    card.getAssignedMembers().stream()
+                        .map(User::getId)
+                        .collect(Collectors.toList()) :
+                    null)
+                .activities(card.getComments() != null ?
+                    card.getComments().stream()
+                        .map(CommentMapper::toActivityDTO)
+                        .collect(Collectors.toList()) :
+                    null)
                 .attachments(card.getAttachments() != null ?
-                        card.getAttachments().stream()
-                                .map(AttachmentMapper::toDTO)
-                                .collect(Collectors.toList()) : null)
-                .comments(card.getComments() != null ?
-                        card.getComments().stream()
-                                .map(CommentMapper::toDTO)
-                                .collect(Collectors.toList()) : null)
+                    card.getAttachments().stream()
+                        .map(AttachmentMapper::toDTO)
+                        .collect(Collectors.toList()) :
+                    null)
                 .createdAt(card.getCreatedAt())
                 .updatedAt(card.getUpdatedAt())
                 .build();

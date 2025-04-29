@@ -1,402 +1,246 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize variables
-    const createCardModal = new bootstrap.Modal(document.getElementById('createCardModal'));
-    const createListModal = new bootstrap.Modal(document.getElementById('createListModal'));
-    const addMemberModal = new bootstrap.Modal(document.getElementById('addMemberModal'));
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
 
-    let currentCardId = null;
-    let cardDetailModal = null;
-
-    // Get CSRF token
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
-
-    // Initialize drag and drop
-    const lists = document.querySelectorAll('.list-cards');
-    lists.forEach(list => {
-        new Sortable(list, {
-            group: 'cards',
+    const listsContainer = document.getElementById('lists-container');
+    if (listsContainer) {
+        new Sortable(listsContainer, {
             animation: 150,
-            ghostClass: 'card-ghost',
-            chosenClass: 'card-chosen',
-            dragClass: 'card-drag',
-            draggable: '.card', // Only .card elements are draggable
-            onEnd: async function(evt) {
-                const cardId = evt.item.getAttribute('data-card-id');
-                const newListId = evt.to.closest('.list').getAttribute('data-list-id');
-                
-                try {
-                    const response = await fetch(`/api/cards/${cardId}/move`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            [csrfHeader]: csrfToken
-                        },
-                        body: JSON.stringify({
-                            listId: newListId
-                        })
-                    });
+            handle: '.list-header',
+            onEnd: (evt) => handleListReorder(evt)
+        });
+    }
 
-                    if (!response.ok) {
-                        let errorMsg = 'Error moving card. Please try again.';
-                        try {
-                            const errorData = await response.json();
-                            if (errorData && errorData.message) errorMsg = errorData.message;
-                        } catch (e) {}
-                        showAlert(errorMsg, 'danger');
-                        evt.from.appendChild(evt.item);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showAlert('Error moving card. Please try again.', 'danger');
-                    evt.from.appendChild(evt.item);
-                }
-            }
+    document.querySelectorAll('.list-cards').forEach(listCards => {
+        new Sortable(listCards, {
+            animation: 150,
+            group: 'cards',
+            onEnd: (evt) => handleCardReorder(evt),
+            filter: '.card-placeholder',
+            preventOnFilter: true
         });
     });
 
-    // Handle card creation modal
-    document.querySelectorAll('.add-card-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const listId = this.getAttribute('data-list-id');
-            document.getElementById('listId').value = listId;
-        });
-    });
-
-    // Handle form submissions
-    document.getElementById('createCardForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const data = {
-            title: formData.get('title'),
-            description: formData.get('description'),
-            deadline: formData.get('deadline'),
-            listId: formData.get('listId')
-        };
+    async function handleListReorder(evt) {
+        const lists = Array.from(evt.to.children);
+        const listIds = lists.map(list => list.getAttribute('data-list-id')).filter(id => id);
 
         try {
-            const response = await fetch(this.action, {
+            const response = await fetch('/employee/boardlists/reorder', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     [csrfHeader]: csrfToken
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ listIds: listIds })
             });
 
-            if (response.ok) {
-                createCardModal.hide();
-                showAlert('Card created successfully!', 'success');
-                location.reload();
-            } else {
-                const errorData = await response.json();
-                showAlert(errorData.message || 'Error creating card. Please try again.', 'danger');
+            if (!response.ok) {
+                throw new Error('Failed to update list order');
             }
         } catch (error) {
-            console.error('Error:', error);
-            showAlert('Error creating card. Please try again.', 'danger');
+            console.error('Error updating list order:', error);
+            evt.item.parentNode.insertBefore(evt.item, evt.oldIndex < evt.newIndex ? evt.oldIndex : evt.oldIndex + 1);
         }
-    });
+    }
 
-    // Handle list deletion
-    document.querySelectorAll('form[action*="/boardlists/delete/"]').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (confirm('Are you sure you want to delete this list? All cards in this list will also be deleted.')) {
-                try {
-                    const response = await fetch(this.action, {
-                        method: 'POST'
-                    });
+    async function handleCardReorder(evt) {
+        if (!evt.to) return;
 
-                    if (response.ok) {
-                        showAlert('List deleted successfully!', 'success');
-                        this.closest('.list').remove();
-                    } else {
-                        showAlert('Error deleting list. Please try again.', 'danger');
-                    }
-                } catch (error) {
-                    showAlert('Error deleting list. Please try again.', 'danger');
-                    console.error('Error:', error);
-                }
+        const listCards = evt.to;
+        const listId = listCards.closest('.list').getAttribute('data-list-id');
+        const cards = Array.from(listCards.querySelectorAll('.card'));
+        const cardIds = cards.map(card => card.getAttribute('data-card-id')).filter(id => id);
+
+        try {
+            const response = await fetch('/employee/cards/reorder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({
+                    listId: listId,
+                    cardIds: cardIds
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update card order');
+            }
+        } catch (error) {
+            console.error('Error updating card order:', error);
+            evt.item.parentNode.insertBefore(evt.item, evt.oldIndex < evt.newIndex ? evt.oldIndex : evt.oldIndex + 1);
+        }
+    }
+
+    const createCardModal = document.getElementById('createCardModal');
+    if (createCardModal) {
+        createCardModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const listId = button.getAttribute('data-list-id');
+            const listIdInput = this.querySelector('input[name="listId"]');
+            if (listIdInput) {
+                listIdInput.value = listId;
             }
         });
-    });
+    }
 
-    // Card detail handling
-    window.openCardDetail = async function(cardElement) {
-        const cardId = cardElement.getAttribute('data-card-id');
-        console.log('Opening card details for ID:', cardId);
-        currentCardId = cardId;
-        
+    const cardForm = document.getElementById('cardForm');
+    if (cardForm) {
+        cardForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch(this.action, {
+                    method: this.method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create card');
+                }
+
+                window.location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error creating card: ' + error.message);
+            }
+        });
+    }
+
+    window.deleteList = async function(listId) {
+        if (confirm('Are you sure you want to delete this list and all its cards?')) {
+            try {
+                const response = await fetch(`/employee/boardlists/${listId}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete list');
+                }
+
+                showAlert('List deleted successfully', 'success');
+                location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error deleting list', 'danger');
+            }
+        }
+    };
+
+    window.openCardDetail = async function(cardId) {
         try {
-            console.log('Fetching card details from:', `/employee/cards/${cardId}`);
             const response = await fetch(`/employee/cards/${cardId}`);
-            
             if (!response.ok) {
-                console.error('Failed to fetch card details:', response.status, response.statusText);
                 throw new Error('Failed to fetch card details');
             }
-            
-            const modalHtml = await response.text();
-            console.log('Received modal HTML:', modalHtml);
-            
-            // Remove existing modal if it exists
-            const existingModal = document.getElementById('cardDetailModal');
-            if (existingModal) {
-                existingModal.remove();
+
+            const html = await response.text();
+            const modalContainer = document.getElementById('modalContainer');
+            if (!modalContainer) {
+                throw new Error('Modal container not found');
             }
-            
-            // Create new modal container
-            const modalContainer = document.createElement('div');
-            modalContainer.innerHTML = modalHtml;
-            document.body.appendChild(modalContainer.firstElementChild);
-            
-            // Initialize the new modal
-            cardDetailModal = new bootstrap.Modal(document.getElementById('cardDetailModal'));
-            
-            // Add event listeners after the modal is shown
-            document.getElementById('cardDetailModal').addEventListener('shown.bs.modal', function() {
-                document.getElementById('cardDetailForm').addEventListener('submit', handleCardUpdate);
-                document.getElementById('commentForm').addEventListener('submit', handleCommentSubmit);
-                document.getElementById('attachmentInput').addEventListener('change', handleFileUpload);
-            });
-            
-            cardDetailModal.show();
-            
+
+            modalContainer.innerHTML = html;
+            const modal = new bootstrap.Modal(document.getElementById('cardDetailModal'));
+            modal.show();
         } catch (error) {
-            console.error('Error in openCardDetail:', error);
-            showAlert('Error loading card details', 'danger');
+            console.error('Error:', error);
+            alert('Error opening card: ' + error.message);
         }
     };
 
-    async function handleCardUpdate(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const data = {
-            id: formData.get('id'),
-            title: formData.get('title'),
-            description: formData.get('description'),
-            deadline: formData.get('deadline')
-        };
-        
-        try {
-            const response = await fetch(`/api/cards/${data.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update card');
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (!e.target.closest('.card-actions')) {
+                const cardId = this.getAttribute('data-card-id');
+                if (cardId) {
+                    openCardDetail(cardId);
+                }
             }
-            
-            showAlert('Card updated successfully', 'success');
-            location.reload();
-        } catch (error) {
-            console.error('Error:', error);
-            showAlert('Error updating card', 'danger');
-        }
-    }
+        });
+    });
 
-    async function handleCommentSubmit(e) {
-        e.preventDefault();
-        
-        const commentText = document.getElementById('commentText').value;
-        if (!commentText.trim()) return;
-        
-        try {
-            const response = await fetch(`/api/cards/${currentCardId}/comments`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                },
-                body: JSON.stringify({ content: commentText })
-            });
+    window.deleteCard = async function(cardId) {
+        if (confirm('Are you sure you want to delete this card?')) {
+            try {
+                const response = await fetch(`/employee/cards/${cardId}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
 
-            if (!response.ok) {
-                throw new Error('Failed to post comment');
+                if (!response.ok) {
+                    throw new Error('Failed to delete card');
+                }
+
+                showAlert('Card deleted successfully', 'success');
+                location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error deleting card', 'danger');
             }
-            
-            document.getElementById('commentText').value = '';
-            showAlert('Comment posted successfully', 'success');
-            location.reload();
-        } catch (error) {
-            console.error('Error:', error);
-            showAlert('Error posting comment', 'danger');
         }
-    }
-
-    async function handleFileUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        try {
-            const response = await fetch(`/api/cards/${currentCardId}/attachments`, {
-                method: 'POST',
-                headers: {
-                    [csrfHeader]: csrfToken
-                },
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to upload file');
-            }
-            
-            showAlert('File uploaded successfully', 'success');
-            location.reload();
-        } catch (error) {
-            console.error('Error:', error);
-            showAlert('Error uploading file', 'danger');
-        }
-    }
-
-    // Member management
-    async function loadCardMembers(memberIds) {
-        const membersList = document.getElementById('assignedMembersList');
-        membersList.innerHTML = '';
-        
-        if (!memberIds || memberIds.length === 0) {
-            membersList.innerHTML = '<p class="text-muted">No members assigned</p>';
-            return;
-        }
-        
-        try {
-            const response = await fetch(`/employee/members?ids=${memberIds.join(',')}`);
-            if (!response.ok) throw new Error('Failed to fetch members');
-            
-            const members = await response.json();
-            members.forEach(member => {
-                const memberDiv = document.createElement('div');
-                memberDiv.className = 'member-item d-flex align-items-center mb-2';
-                memberDiv.innerHTML = `
-                    <span class="member-avatar me-2">${member.username.charAt(0).toUpperCase()}</span>
-                    <span class="member-name">${member.username}</span>
-                    <button class="btn btn-sm btn-danger ms-auto" onclick="removeMember(${member.id})">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                membersList.appendChild(memberDiv);
-            });
-        } catch (error) {
-            console.error('Error:', error);
-            membersList.innerHTML = '<p class="text-danger">Error loading members</p>';
-        }
-    }
-
-    window.showAddMemberModal = function() {
-        const cardDetailModal = bootstrap.Modal.getInstance(document.getElementById('cardDetailModal'));
-        const addMemberModal = new bootstrap.Modal(document.getElementById('addMemberModal'));
-        
-        // Store the current scroll position
-        const scrollPosition = document.body.style.top;
-        
-        addMemberModal.show();
-        
-        // Event listener for when add member modal is hidden
-        document.getElementById('addMemberModal').addEventListener('hidden.bs.modal', function() {
-            // Restore the card detail modal's scroll position
-            document.body.style.top = scrollPosition;
-            cardDetailModal.show();
-        }, { once: true });
     };
 
-    window.addMemberToCard = async function(memberId) {
-        if (!memberId) return;
-        
+    window.addMemberToCard = async function(cardId, memberId) {
         try {
-            const response = await fetch(`/employee/cards/${currentCardId}/members`, {
+            const response = await fetch(`/employee/cards/${cardId}/members/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     [csrfHeader]: csrfToken
                 },
-                body: JSON.stringify({ memberId })
+                body: JSON.stringify({ memberId: memberId })
             });
 
-            if (!response.ok) throw new Error('Failed to add member');
-            
-            const card = await response.json();
-            await loadCardMembers(card.assignedMemberIds);
+            if (!response.ok) {
+                throw new Error('Failed to add member');
+            }
+
             showAlert('Member added successfully', 'success');
-            
-            // Reset the select
-            document.getElementById('memberSelect').value = '';
+            location.reload();
         } catch (error) {
             console.error('Error:', error);
             showAlert('Error adding member', 'danger');
         }
     };
 
-    window.removeMember = async function(memberId) {
-        if (!confirm('Are you sure you want to remove this member?')) return;
-        
+    window.removeMemberFromCard = async function(cardId, memberId) {
         try {
-            const response = await fetch(`/employee/cards/${currentCardId}/members/${memberId}`, {
-                method: 'DELETE',
+            const response = await fetch(`/employee/cards/${cardId}/members/remove`, {
+                method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     [csrfHeader]: csrfToken
-                }
+                },
+                body: JSON.stringify({ memberId: memberId })
             });
 
-            if (!response.ok) throw new Error('Failed to remove member');
-            
-            const card = await response.json();
-            await loadCardMembers(card.assignedMemberIds);
+            if (!response.ok) {
+                throw new Error('Failed to remove member');
+            }
+
             showAlert('Member removed successfully', 'success');
+            location.reload();
         } catch (error) {
             console.error('Error:', error);
             showAlert('Error removing member', 'danger');
         }
     };
 
-    window.deleteCard = async function(cardId) {
-        if (!confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
-            return;
-        }
-        
-        try {
-            const response = await fetch(`/employee/cards/${cardId}`, {
-                method: 'DELETE',
-                headers: {
-                    [csrfHeader]: csrfToken
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to delete card');
-            }
-            
-            // Close the modal and show success message
-            const cardDetailModal = bootstrap.Modal.getInstance(document.getElementById('cardDetailModal'));
-            cardDetailModal.hide();
-            showAlert('Card deleted successfully', 'success');
-            
-            // Remove the card from the UI
-            const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
-            if (cardElement) {
-                cardElement.remove();
-            } else {
-                location.reload();
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showAlert('Error deleting card', 'danger');
-        }
-    };
-
-    // Alert function
-    function showAlert(message, type) {
+    function showAlert(message, type = 'success') {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
         alertDiv.role = 'alert';
@@ -405,19 +249,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
         document.body.appendChild(alertDiv);
-
+        
         setTimeout(() => {
             alertDiv.remove();
         }, 5000);
     }
 
-    // Clear form inputs when modals are hidden
-    document.getElementById('createCardModal').addEventListener('hidden.bs.modal', function() {
-        document.getElementById('createCardForm').reset();
-    });
-
-    document.getElementById('createListModal').addEventListener('hidden.bs.modal', function() {
-        document.getElementById('listTitle').value = '';
-        document.getElementById('listDescription').value = '';
-    });
+    window.openCardDetail = openCardDetail;
 }); 

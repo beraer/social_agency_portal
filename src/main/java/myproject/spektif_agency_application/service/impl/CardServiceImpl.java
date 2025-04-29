@@ -132,4 +132,19 @@ public class CardServiceImpl implements CardService {
         card.setList(newList);
         cardRepository.save(card);
     }
+
+    @Override
+    @Transactional
+    public void reorderCards(Long listId, List<Long> cardIds) {
+        BoardList list = boardListRepository.findById(listId)
+                .orElseThrow(() -> new RuntimeException("List not found"));
+        
+        List<Card> cards = cardRepository.findAllById(cardIds);
+        
+        // Update each card's list and save
+        cards.forEach(card -> {
+            card.setList(list);
+            cardRepository.save(card);
+        });
+    }
 }

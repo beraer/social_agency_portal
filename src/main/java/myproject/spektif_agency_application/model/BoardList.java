@@ -24,8 +24,11 @@ public class BoardList {
     @Column(length = 1000)
     private String description;
 
+    @Column(name = "list_order")
+    private Integer order;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
     @ManyToMany
@@ -37,7 +40,7 @@ public class BoardList {
     @Builder.Default
     private List<User> members = new ArrayList<>();
 
-    @OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<Card> cards = new ArrayList<>();
 }

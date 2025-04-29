@@ -10,10 +10,12 @@ import myproject.spektif_agency_application.repository.BoardListRepository;
 import myproject.spektif_agency_application.repository.UserRepository;
 import myproject.spektif_agency_application.service.BoardListService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +36,6 @@ public class BoardListServiceImpl implements BoardListService {
         BoardList list = BoardListMapper.toEntity(dto, owner, members);
         return BoardListMapper.toDTO(boardListRepository.save(list));
     }
-
 
     @Override
     public Optional<BoardListDTO> getById(Long id) {
@@ -72,4 +73,15 @@ public class BoardListServiceImpl implements BoardListService {
         boardListRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional
+    public void reorderLists(List<Long> listIds) {
+        IntStream.range(0, listIds.size()).forEach(index -> {
+            Long listId = listIds.get(index);
+            BoardList list = boardListRepository.findById(listId)
+                    .orElseThrow(() -> new IllegalArgumentException("List not found with id: " + listId));
+            list.setOrder(index);
+            boardListRepository.save(list);
+        });
+    }
 }

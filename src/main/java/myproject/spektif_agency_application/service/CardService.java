@@ -23,4 +23,6 @@ public interface CardService {
 
     void moveCardToList(Long cardId, Long newListId);
 
+    void reorderCards(Long listId, List<Long> cardIds);
+
 }

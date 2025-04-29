@@ -43,7 +43,6 @@ public class DataInitializer implements CommandLineRunner {
             client.setRole(Role.CLIENT);
             userRepository.save(client);
 
-            // Create board lists
             BoardList tasarim = new BoardList();
             tasarim.setTitle("TASARIM");
             tasarim.setDescription("Design-related tasks");
@@ -56,7 +55,7 @@ public class DataInitializer implements CommandLineRunner {
             yazar.setOwner(employee);
             boardListRepository.save(yazar);
 
-            // Create cards
+    
             Card card1 = new Card();
             card1.setTitle("Vox İncek 3'lü Feed Tasarımı");
             card1.setDescription("Feed tasarımı yapılacak");

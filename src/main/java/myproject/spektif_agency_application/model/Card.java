@@ -33,6 +33,7 @@ public class Card {
     private Project project;
 
     @Column(name = "is_project", nullable = false)
+    @Builder.Default
     private Boolean isProject = false;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -47,9 +48,11 @@ public class Card {
     private LocalDateTime deadline;
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Attachment> attachments = new ArrayList<>();
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     private LocalDateTime createdAt;
